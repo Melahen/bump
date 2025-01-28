@@ -15,7 +15,6 @@ fn spawn_splashscreen(mut app_state: ResMut<NextState<GameState>>) {
 }
 
 fn despawn_splashscreen(mut app_state: ResMut<NextState<GameState>>) {
-
 }
 
 fn increase_alpha(mut app_state: ResMut<NextState<GameState>>) {
@@ -31,8 +30,8 @@ impl Plugin for SplashScreenPlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<GameState>()
             .add_systems(OnEnter(GameState::Spawn), spawn_splashscreen)
-            .add_system(Update, increase_alpha.run_if(in_state(GameState::AlphaInc)))
-            .add_system(Update, increase_alpha.run_if(in_state(GameState::AlphaDec)))
-            .add_systems(OnEnter(GameState::Spawn), despawn_splashscreen)
+            .add_systems(Update, increase_alpha.run_if(in_state(GameState::AlphaInc)))
+            .add_systems(Update, decrease_alpha.run_if(in_state(GameState::AlphaDec)))
+            .add_systems(OnEnter(GameState::Spawn), despawn_splashscreen);
     }
 }
