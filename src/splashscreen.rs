@@ -15,7 +15,7 @@ fn spawn_splashscreen(mut app_state: ResMut<NextState<GameState>>) {
 }
 
 fn despawn_splashscreen(mut app_state: ResMut<NextState<GameState>>) {
-    app_state.set()
+
 }
 
 fn increase_alpha(mut app_state: ResMut<NextState<GameState>>) {
