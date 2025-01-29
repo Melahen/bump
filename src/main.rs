@@ -3,6 +3,7 @@ mod splashscreen;
 
 use bevy::prelude::*;
 use camera::CameraPlugin;
+use crate::splashscreen::SplashScreenPlugin;
 
 fn main() {
     App::new()
@@ -14,5 +15,6 @@ fn main() {
         })
         .add_plugins(DefaultPlugins)
         .add_plugins(CameraPlugin)
+        .add_plugins(SplashScreenPlugin)
         .run();
 }
