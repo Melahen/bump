@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::splashscreen::SplashscreenState::{AlphaDec, AlphaInc, Loading, Unload};
+use crate::splashscreen::SplashscreenState::*;
 use bevy::asset::LoadState;
 
 pub struct SplashScreenPlugin;
@@ -20,7 +20,9 @@ pub enum SplashscreenState {
     Loading,
     AlphaInc,
     AlphaDec,
-    Unload
+    Unload,
+    CheckDespawned,
+    SplashscreenEnd
 }
 
 fn load_call(
@@ -96,8 +98,21 @@ fn decrease_alpha(
     if sprite.color.alpha() < 0.0001 { app_state.set(Unload); }
 }
 
-fn unload(mut app_state: ResMut<NextState<SplashscreenState>>) {
+fn unload(
+    mut commands: Commands,
+    mut query: Query<(Entity, &mut Sprite, &Logo)>,
+    mut app_state: ResMut<NextState<SplashscreenState>>)
+{
+    let (to_despawn_logo_entity, _, _) = query.single_mut();
+    commands.entity(to_despawn_logo_entity).despawn();
+    app_state.set(CheckDespawned);
+}
 
+fn check_despawned(
+    query: Query<(&Sprite, &Logo)>,
+    mut app_state: ResMut<NextState<SplashscreenState>>
+) {
+    if query.is_empty() { app_state.set(SplashscreenEnd); }
 }
 
 
@@ -106,10 +121,12 @@ impl Plugin for SplashScreenPlugin {
         app.init_resource::<LogoAssetsLoading>()
             .init_resource::<FadeInDone>()
             .init_state::<SplashscreenState>()
-            .add_systems(OnEnter(SplashscreenState::LoadCall),  load_call)
+            .add_systems(OnEnter(LoadCall),  load_call)
             .add_systems(Update, loading.run_if(in_state(Loading)))
             .add_systems(Update, increase_alpha.run_if(in_state(AlphaInc)))
             .add_systems(Update, decrease_alpha.run_if(in_state(AlphaDec)))
+            .add_systems(OnEnter(Unload),  unload)
+            .add_systems(Update, check_despawned.run_if(in_state(CheckDespawned)))
         ;
     }
 }
