@@ -1,6 +1,7 @@
 mod camera;
 mod splashscreen;
 mod states;
+mod menu;
 
 use bevy::prelude::*;
 use camera::CameraPlugin;
@@ -18,5 +19,6 @@ fn main() {
         .add_plugins(CameraPlugin)
         .add_plugins(StatesPlugin)
         .add_plugins(SplashScreenPlugin)
+
         .run();
 }
