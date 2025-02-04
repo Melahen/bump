@@ -1,6 +1,8 @@
 use bevy::prelude::*;
-use crate::splashscreen::SplashscreenState::*;
 use bevy::asset::LoadState;
+use crate::splashscreen::SplashscreenState::*;
+use crate::states::*;
+use crate::states::GameState::Menu;
 
 pub struct SplashScreenPlugin;
 
@@ -13,7 +15,8 @@ struct FadeInDone(f32);
 #[derive(Component)]
 struct Logo;
 
-#[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
+#[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, SubStates)]
+#[source(GameState = GameState::Splashscreen)]
 pub enum SplashscreenState {
     #[default]
     LoadCall,
@@ -21,8 +24,7 @@ pub enum SplashscreenState {
     AlphaInc,
     AlphaDec,
     Unload,
-    CheckDespawned,
-    SplashscreenEnd
+    CheckDespawned
 }
 
 fn load_call(
@@ -110,9 +112,9 @@ fn unload(
 
 fn check_despawned(
     query: Query<(&Sprite, &Logo)>,
-    mut app_state: ResMut<NextState<SplashscreenState>>
+    mut app_state: ResMut<NextState<GameState>>
 ) {
-    if query.is_empty() { app_state.set(SplashscreenEnd); }
+    if query.is_empty() { app_state.set(Menu); }
 }
 
 
@@ -120,7 +122,7 @@ impl Plugin for SplashScreenPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<LogoAssetsLoading>()
             .init_resource::<FadeInDone>()
-            .init_state::<SplashscreenState>()
+            .add_sub_state::<SplashscreenState>()
             .add_systems(OnEnter(LoadCall),  load_call)
             .add_systems(Update, loading.run_if(in_state(Loading)))
             .add_systems(Update, increase_alpha.run_if(in_state(AlphaInc)))
